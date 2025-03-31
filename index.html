@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codebrae - Projects Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&family=Tw+Cen+MT&display=swap" rel="stylesheet">
+    <link rel="icon" href="assets/images/logo_black.png">
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #e9f0ff;
+            width: 100%;
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-size: 16px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            scale: 0.8;
+        }
+
+        .logo {
+            width: 35px;
+            height: 35px;
+            margin-right: 12px;
+        }
+
+        .brand-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d2d2d;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #fcfcfc;
+            border: 1px solid #707070;
+            border-radius: 20px;
+            padding: 5px 10px 5px 15px;
+            max-width: 220px;
+            scale: 0.9;
+        }
+
+        .username {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #2d2d2d;
+            margin-right: 10px;
+        }
+
+        .profile-image {
+            width: 35px;
+            height: 35px;
+        }
+
+        .projects-container {
+            position: relative;
+            margin: 0 auto;
+            width: 100%;
+            background-color: #ffffff14;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 5px 5px 30px rgba(0, 18, 255, 0.1);
+            margin-bottom: 60px;
+            scale: 0.9;
+        }
+
+        .projects-heading {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .project-card {
+            position: relative;
+            background-color: rgba(255, 255, 255, 0.61);
+            border-radius: 20px;
+            margin-bottom: 10px;
+            padding: 10px;
+            display: flex;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .project-card:hover {
+            filter: brightness(90%);
+        }
+
+        .project-card:active {
+            scale: 0.99;
+        }
+
+        .project-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 20px;
+            flex-shrink: 0;
+            scale: 0.8;
+        }
+
+        .project-icon-1 {
+            background: linear-gradient(135deg, #5d4dff, #b970ff);
+        }
+
+        .project-icon-2 {
+            background: linear-gradient(135deg, #ff4d9c, #ff974d);
+        }
+
+        .project-icon-3 {
+            background: linear-gradient(135deg, #4df5ff, #4dffb1);
+        }
+
+        .project-letter {
+            font-family: 'Tw Cen MT', sans-serif;
+            font-size: 2.5rem;
+            color: white;
+            mix-blend-mode: overlay;
+        }
+
+        .project-details {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex-grow: 1;
+            scale: 0.9;
+        }
+
+        .project-name {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .project-date {
+            font-size: 0.9rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+        }
+
+        .project-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .project-tag {
+            background-color: #f5f5f5;
+            border: 1px solid #707070;
+            border-radius: 8px;
+            padding: 3px 10px;
+            font-size: 0.8rem;
+            font-weight: 300;
+        }
+
+        .navigate-button {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100px;
+            height: 40px;
+            border: 1.5px solid #6f6f6f;
+            border-radius: 20px;
+            background: transparent;
+            font-size: 0.9rem;
+            font-weight: 300;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+        
+        .navigate-button:hover {
+            background-color: #f5f5f5;
+        }
+
+        .create-button {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 60px;
+            height: 60px;
+            border-radius: 20px;
+            background-color: #4d65ff;
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(77, 101, 255, 0.4);
+            transition: all 0.3s;
+        }
+        
+        .create-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(77, 101, 255, 0.6);
+        }
+
+        .create-icon {
+            width: 24px;
+            height: 24px;
+            color: white;
+        }
+
+        /* Responsive adjustments */
+        @media (min-width: 768px) {
+            .project-icon {
+                width: 100px;
+                height: 100px;
+                border-radius: 20px;
+            }
+            
+            .project-letter {
+                font-size: 3rem;
+            }
+            
+            .project-name {
+                font-size: 1.4rem;
+            }
+            
+            .project-date {
+                font-size: 1rem;
+            }
+            
+            .navigate-button {
+                width: 120px;
+                height: 45px;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .header {
+                padding: 20px 30px;
+            }
+            
+            .logo {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .brand-name {
+                font-size: 1.75rem;
+            }
+            
+            .projects-container {
+                padding: 30px;
+            }
+            
+            .projects-heading {
+                font-size: 2rem;
+                margin-bottom: 25px;
+            }
+            
+            .project-card {
+                padding: 20px;
+                border-radius: 25px;
+            }
+            
+            .project-icon {
+                width: 120px;
+                height: 120px;
+                margin-right: 30px;
+            }
+            
+            .project-letter {
+                font-size: 3.5rem;
+            }
+            
+            .project-name {
+                font-size: 1.5rem;
+            }
+            
+            .navigate-button {
+                width: 140px;
+                height: 50px;
+                font-size: 1rem;
+            }
+        }
+
+
+
+        /* Animation effects */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .project-card {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        .project-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .project-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .project-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo-container">
+            <img draggable="false" src="assets/images/logo_black.png" alt="Codebrae Logo" class="logo">
+            <h1 class="brand-name">Codebrae</h1>
+        </div>
+        <div class="user-profile">
+            <span class="username">Username</span>
+            <img draggable="false" src="assets/images/ic_default_profile.png" alt="User Profile" class="profile-image">
+        </div>
+    </header>
+
+    <main class="projects-container">
+        <h2 class="projects-heading">Projects</h2>
+
+        <div class="project-card">
+            <div class="project-icon project-icon-1">
+                <span class="project-letter">S</span>
+            </div>
+            <div class="project-details">
+                <h3 class="project-name">Signup Form</h3>
+                <p class="project-date">Created on 13/06/2025</p>
+                <div class="project-tags">
+                    <span class="project-tag">Forms</span>
+                </div>
+            </div>
+           
+        </div>
+
+        <div class="project-card">
+            <div class="project-icon project-icon-2">
+                <span class="project-letter">G</span>
+            </div>
+            <div class="project-details">
+                <h3 class="project-name">Get Started Website</h3>
+                <p class="project-date">Created on 08/04/2025</p>
+                <div class="project-tags">
+                    <span class="project-tag">Website</span>
+                    <span class="project-tag">Full-Stack</span>
+                </div>
+            </div>
+           
+        </div>
+
+        <div class="project-card">
+            <div class="project-icon project-icon-3">
+                <span class="project-letter">C</span>
+            </div>
+            <div class="project-details">
+                <h3 class="project-name">Caffeine Article</h3>
+                <p class="project-date">Created on 02/04/2025</p>
+                <div class="project-tags">
+                    <span class="project-tag">Website</span>
+                    <span class="project-tag">Article</span>
+                </div>
+            </div>
+           
+        </div>
+    </main>
+
+    <button class="create-button">
+        <svg xmlns="http://www.w3.org/2000/svg" class="create-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+    </button>
+    <script src="main.js"></script>
+    <script src="fb.js" ></script>
+</body>
+</html>
