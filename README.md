@@ -1,2 +1,2 @@
 # codebrae
-An Advanced HTML code generator.
+Codebrae is the place to build and use the tools everyone would need in their everyday in a centeralized environment.
